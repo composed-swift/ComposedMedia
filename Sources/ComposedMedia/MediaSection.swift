@@ -8,9 +8,11 @@ open class MediaSection<Element>: NSObject, Section, PHPhotoLibraryChangeObserve
     }
 
     private var fetchResult: PHFetchResult<Element>
-
-    public var numberOfElements: Int { return fetchResult.count }
     public var updateDelegate: SectionUpdateDelegate?
+
+    public var numberOfElements: Int {
+        return fetchResult.count
+    }
 
     public init(fetchResult: PHFetchResult<Element>) {
         self.fetchResult = fetchResult
@@ -25,8 +27,15 @@ open class MediaSection<Element>: NSObject, Section, PHPhotoLibraryChangeObserve
 
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
         DispatchQueue.main.sync {
-            updateDelegate?.sectionWillUpdate(self)
             guard let details = changeInstance.changeDetails(for: self.fetchResult) else { return }
+            fetchResult = details.fetchResultAfterChanges
+
+            guard details.hasIncrementalChanges else {
+                updateDelegate?.sectionDidReload(self)
+                return
+            }
+
+            updateDelegate?.sectionWillUpdate(self)
 
             details.removedIndexes?.forEach {
                 updateDelegate?.section(self, didRemoveElementAt: $0)
