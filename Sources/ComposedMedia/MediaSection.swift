@@ -22,7 +22,7 @@ open class MediaSection<Element>: NSObject, Section, PHPhotoLibraryChangeObserve
 
     public func replace(fetchResult: PHFetchResult<Element>) {
         self.fetchResult = fetchResult
-        updateDelegate?.sectionDidReload(self)
+        updateDelegate?.invalidateAll(self)
     }
 
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
@@ -31,11 +31,11 @@ open class MediaSection<Element>: NSObject, Section, PHPhotoLibraryChangeObserve
             fetchResult = details.fetchResultAfterChanges
 
             guard details.hasIncrementalChanges else {
-                updateDelegate?.sectionDidReload(self)
+                updateDelegate?.invalidateAll(self)
                 return
             }
 
-            updateDelegate?.sectionWillUpdate(self)
+            updateDelegate?.willBeginUpdating(self)
 
             details.removedIndexes?.forEach {
                 updateDelegate?.section(self, didRemoveElementAt: $0)
@@ -54,7 +54,7 @@ open class MediaSection<Element>: NSObject, Section, PHPhotoLibraryChangeObserve
                 self.updateDelegate?.section(self, didMoveElementAt: from, to: to)
             }
 
-            updateDelegate?.sectionDidUpdate(self)
+            updateDelegate?.didEndUpdating(self)
         }
     }
 

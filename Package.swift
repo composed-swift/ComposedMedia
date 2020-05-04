@@ -14,7 +14,7 @@ let package = Package(
             targets: ["ComposedMedia"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/composed-swift/Composed", from: "0.0.0"),
+        .package(url: "https://github.com/composed-swift/Composed", from: "1.0.0"),
     ],
     targets: [
         .target(
